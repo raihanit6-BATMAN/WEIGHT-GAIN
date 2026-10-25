@@ -40,3 +40,26 @@ A localized, progressive web application (PWA) tailored specifically for hardgai
    ```bash
    git clone [https://github.com/raihanit6-BATMAN/WEIGHT-GAIN.git](https://github.com/raihanit6-BATMAN/WEIGHT-GAIN.git)
    cd WEIGHT-GAIN
+
+## 📱 Mobile App Installation (Android & iOS)
+
+You can install and use this application directly on your mobile device as a Progressive Web App (PWA) without needing an app store.
+
+* **Live App URL:** [https://weight-gain-phi.vercel.app/](https://weight-gain-phi.vercel.app/)
+
+---
+
+### Android (Google Chrome)
+1. Open [https://weight-gain-phi.vercel.app/](https://weight-gain-phi.vercel.app/) in **Google Chrome** on your phone.
+2. Tap the bottom banner prompt **"Add to Home screen"** or **"Install App"**.
+   * *If the prompt doesn't appear automatically:* Tap the **three dots (⋮)** menu in the top-right corner of Chrome and select **"Install app"** (or **"Add to Home screen"**).
+3. Confirm the installation. The app icon will now appear in your app drawer and home screen.
+4. Launch the app from your home screen and tap **"Allow"** when prompted for notifications to receive scheduled daily reminders (10:00 AM, 2:00 PM, 9:00 PM).
+
+---
+
+### iOS / iPhone (Safari)
+1. Open [https://weight-gain-phi.vercel.app/](https://weight-gain-phi.vercel.app/) in **Safari**.
+2. Tap the **Share** button (the square icon with an upward arrow at the bottom).
+3. Scroll down and tap **"Add to Home Screen"**.
+4. Tap **Add** in the top-right corner to place the app on your home screen.
