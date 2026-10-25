@@ -1,0 +1,6 @@
+{
+  "name": "Weight Gain - Bangladeshi Health & Nutrition Guide",
+  "description": "Practical weight gain and nutrition guide tailored for Bangladesh, featuring local food calorie and portion calculator, 3L hydration tracker, macro targets, and body progress tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
