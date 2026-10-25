@@ -16,6 +16,7 @@ interface FoodDirectoryViewProps {
   onLogFood: (food: FoodItem, servings: number, mealType: MealType) => void;
   onLogSegments?: (segments: ParsedMealSegment[], mealType: MealType) => void;
   onLogCustomItem?: (item: LoggedMealItem) => void;
+  onOpenSearchModal?: () => void;
   lang: 'en' | 'bn';
   initialMealType?: MealType;
 }
@@ -24,6 +25,7 @@ export const FoodDirectoryView: React.FC<FoodDirectoryViewProps> = ({
   onLogFood,
   onLogSegments,
   onLogCustomItem,
+  onOpenSearchModal,
   lang,
   initialMealType = 'breakfast',
 }) => {
@@ -190,13 +192,26 @@ export const FoodDirectoryView: React.FC<FoodDirectoryViewProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={() => setShowCustomModal(true)}
-            className="text-xs px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 transition-colors font-medium flex items-center gap-1"
-          >
-            <Plus className="w-3.5 h-3.5 text-emerald-400" />
-            {lang === 'bn' ? 'কাস্টম খাবার যোগ' : 'Add Custom Food'}
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {onOpenSearchModal && (
+              <button
+                type="button"
+                onClick={onOpenSearchModal}
+                className="text-xs px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-bold transition-all flex items-center gap-1.5 shadow-md shadow-emerald-950/40 active:scale-95"
+              >
+                <Search className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{lang === 'bn' ? 'দ্রুত সার্চ ও লগ' : 'Instant Search & Log'}</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowCustomModal(true)}
+              className="text-xs px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 transition-colors font-medium flex items-center gap-1"
+            >
+              <Plus className="w-3.5 h-3.5 text-emerald-400" />
+              {lang === 'bn' ? 'কাস্টম খাবার যোগ' : 'Add Custom Food'}
+            </button>
+          </div>
         </div>
 
         {/* Quick Mode Switcher */}

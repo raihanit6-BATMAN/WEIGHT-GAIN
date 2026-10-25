@@ -39,18 +39,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3">
         {/* Brand / Logo */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-950 via-zinc-900 to-emerald-900 border border-emerald-500/40 flex items-center justify-center shadow-lg shadow-emerald-950/60 shrink-0">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 3L5 7V15C5 21.8 9.7 28.1 16 30C22.3 28.1 27 21.8 27 15V7L16 3Z" fill="url(#wg-gradient)" stroke="#10b981" strokeWidth="1.5" />
-              <path d="M10 18L14 14L17 17L22 11" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M18.5 11H22V14.5" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              <defs>
-                <linearGradient id="wg-gradient" x1="5" y1="3" x2="27" y2="30" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#047857" stopOpacity="0.7"/>
-                  <stop stopColor="#064e3b" stopOpacity="0.95"/>
-                </linearGradient>
-              </defs>
-            </svg>
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-black border border-zinc-700/80 flex items-center justify-center shadow-lg shadow-black/80 overflow-hidden shrink-0">
+            <img
+              src="/assets/aistudio/Gym_e79f6db9.jpg"
+              alt="Weight Gain BD Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">

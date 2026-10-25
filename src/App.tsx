@@ -44,6 +44,7 @@ import { GroceryBazaarView } from './components/GroceryBazaarView';
 import { WeightTrackerView } from './components/WeightTrackerView';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { InAppReminderAlert } from './components/InAppReminderAlert';
+import { FastFoodSearchModal } from './components/FastFoodSearchModal';
 import { RotateCcw } from 'lucide-react';
 
 export default function App() {
@@ -57,6 +58,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('today');
   const [isMobileFrame, setIsMobileFrame] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const [selectedSlotForFood, setSelectedSlotForFood] = useState<MealType>('breakfast');
   const [activeInAppReminder, setActiveInAppReminder] = useState<ReminderAlert | null>(null);
   const [recentLoggedMeal, setRecentLoggedMeal] = useState<{
@@ -247,7 +249,7 @@ export default function App() {
 
   const handleOpenAddFoodModal = (mealType: MealType) => {
     setSelectedSlotForFood(mealType);
-    setActiveTab('foods');
+    setShowSearchModal(true);
   };
 
   const handleAddWeightEntry = (entry: WeightHistoryEntry) => {
@@ -289,6 +291,7 @@ export default function App() {
             onLogFood={handleLogFood}
             onLogSegments={handleLogSegments}
             onLogCustomItem={handleLogCustomItem}
+            onOpenSearchModal={() => setShowSearchModal(true)}
             lang={lang}
             initialMealType={selectedSlotForFood}
           />
@@ -415,6 +418,15 @@ export default function App() {
           lang={lang}
         />
       </div>
+
+      {/* Unified Fast Search & Add Food Modal */}
+      <FastFoodSearchModal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        initialMealType={selectedSlotForFood}
+        onLogFood={handleLogFood}
+        lang={lang}
+      />
 
       {/* Profile & Health Calculator Modal */}
       <ProfileModal

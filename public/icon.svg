@@ -1,20 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="128" fill="#0f172a"/>
-  <defs>
-    <linearGradient id="shieldGrad" x1="128" y1="96" x2="384" y2="416" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#10b981"/>
-      <stop offset="100%" stop-color="#047857"/>
-    </linearGradient>
-    <linearGradient id="glowGrad" x1="256" y1="64" x2="256" y2="448" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#34d399" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#059669" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-  <circle cx="256" cy="256" r="180" fill="url(#glowGrad)"/>
-  <path d="M256 80L128 128V240C128 328 182.4 408.8 256 432C329.6 408.8 384 328 384 240V128L256 80Z" fill="url(#shieldGrad)" stroke="#34d399" stroke-width="12" stroke-linejoin="round"/>
-  <!-- Trending Up Weight Arrow -->
-  <path d="M192 288L240 240L280 280L336 208" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M296 208H336V248" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Calorie Dot -->
-  <circle cx="340" cy="180" r="10" fill="#fbbf24"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#000000"/>
+  <image href="/assets/aistudio/Gym_e79f6db9.jpg" x="0" y="0" width="512" height="512" preserveAspectRatio="xMidYMid meet"/>
 </svg>

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { LayoutDashboard, Utensils, CalendarDays, Coffee, ShoppingBag, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Utensils, CalendarDays, Coffee, TrendingUp } from 'lucide-react';
 
 export type TabType = 'today' | 'foods' | 'plans' | 'recipes' | 'grocery' | 'tracker';
 
@@ -43,12 +43,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       labelEn: 'Shakes',
       labelBn: 'পাওয়ার শেক',
       icon: Coffee,
-    },
-    {
-      id: 'grocery' as TabType,
-      labelEn: 'Bazaar',
-      labelBn: 'বাজার লিস্ট',
-      icon: ShoppingBag,
     },
     {
       id: 'tracker' as TabType,

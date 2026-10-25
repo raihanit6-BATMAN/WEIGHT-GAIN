@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import {
   convertHeightToCm,
@@ -69,47 +69,107 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
 
-  const [formData, setFormData] = useState<UserProfile>({
-    ...profile,
-    dailyWaterGoalMl: profile.dailyWaterGoalMl || (profile.dailyWaterGoalGlasses * 250) || 3000,
-  });
+  // Controlled form inputs with fluid raw string state (prevents input snapping/locking on backspace)
+  const [rawAge, setRawAge] = useState<string>(String(profile.age || 26));
+  const [gender, setGender] = useState<'male' | 'female'>(profile.gender || 'male');
+  const [rawHeightFeet, setRawHeightFeet] = useState<string>(String(profile.heightFeet || 5));
+  const [rawHeightInches, setRawHeightInches] = useState<string>(String(profile.heightInches || 0));
+  const [rawWeightKg, setRawWeightKg] = useState<string>(String(profile.weightKg || 50));
+  const [rawTargetWeightKg, setRawTargetWeightKg] = useState<string>(String(profile.targetWeightKg || 60));
+  const [rawWaterGoalMl, setRawWaterGoalMl] = useState<string>(
+    String(profile.dailyWaterGoalMl || (profile.dailyWaterGoalGlasses * 250) || 3000)
+  );
+  const [activityLevel, setActivityLevel] = useState<ActivityLevel>(profile.activityLevel || 'light');
+  const [weightGainPace, setWeightGainPace] = useState<WeightGainPace>(profile.weightGainPace || 'steady');
+
+  // Synchronize state when modal is opened or profile changes
+  useEffect(() => {
+    if (isOpen) {
+      setRawAge(String(profile.age || 26));
+      setGender(profile.gender || 'male');
+      setRawHeightFeet(String(profile.heightFeet || 5));
+      setRawHeightInches(String(profile.heightInches || 0));
+      setRawWeightKg(String(profile.weightKg || 50));
+      setRawTargetWeightKg(String(profile.targetWeightKg || 60));
+      setRawWaterGoalMl(String(profile.dailyWaterGoalMl || (profile.dailyWaterGoalGlasses * 250) || 3000));
+      setActivityLevel(profile.activityLevel || 'light');
+      setWeightGainPace(profile.weightGainPace || 'steady');
+    }
+  }, [isOpen, profile]);
 
   if (!isOpen) return null;
 
-  const heightCm = convertHeightToCm(formData.heightFeet, formData.heightInches);
-  const bmiResult = calculateBMI(formData.weightKg, heightCm);
-  const bmr = calculateBMR(formData.weightKg, heightCm, formData.age, formData.gender);
-  const tdee = calculateTDEE(bmr, formData.activityLevel);
-  const calorieTargets = calculateTargetCalories(tdee, formData.weightGainPace, formData.weightKg);
+  // Live parsed calculations for instant feedback without locking
+  const parsedFeet = rawHeightFeet === '' ? 5 : (Number(rawHeightFeet) || 5);
+  const parsedInches = rawHeightInches === '' ? 0 : (Number(rawHeightInches) || 0);
+  const heightCm = convertHeightToCm(parsedFeet, parsedInches);
+  const parsedWeightKg = rawWeightKg === '' ? profile.weightKg : (Number(rawWeightKg) || profile.weightKg);
+  const parsedTargetWeightKg = rawTargetWeightKg === '' ? profile.targetWeightKg : (Number(rawTargetWeightKg) || profile.targetWeightKg);
+  const parsedAge = rawAge === '' ? profile.age : (Number(rawAge) || profile.age);
+  const parsedWaterMl = rawWaterGoalMl === '' ? 3000 : (Number(rawWaterGoalMl) || 3000);
+
+  // Unified formData proxy for legacy assessment / reminder tabs
+  const formData: UserProfile = {
+    ...profile,
+    age: parsedAge,
+    gender,
+    heightFeet: parsedFeet,
+    heightInches: parsedInches,
+    weightKg: parsedWeightKg,
+    targetWeightKg: parsedTargetWeightKg,
+    activityLevel,
+    weightGainPace,
+    dailyWaterGoalMl: parsedWaterMl,
+    dailyWaterGoalGlasses: Math.round(parsedWaterMl / 250),
+  };
+
+  const bmiResult = calculateBMI(parsedWeightKg, heightCm);
+  const bmr = calculateBMR(parsedWeightKg, heightCm, parsedAge, gender);
+  const tdee = calculateTDEE(bmr, activityLevel);
+  const calorieTargets = calculateTargetCalories(tdee, weightGainPace, parsedWeightKg);
   const timeline = estimateTargetTimeline(
-    formData.weightKg,
-    formData.targetWeightKg,
+    parsedWeightKg,
+    parsedTargetWeightKg,
     calorieTargets.estimatedWeeklyGainKg
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...formData,
-      dailyWaterGoalGlasses: Math.round((formData.dailyWaterGoalMl || 3000) / 250),
-    });
+    const finalFeet = Math.max(3, Math.min(7, Number(rawHeightFeet) || profile.heightFeet || 5));
+    const finalInches = Math.max(0, Math.min(11, rawHeightInches === '' ? 0 : (Number(rawHeightInches) || 0)));
+    const finalWeight = Math.max(25, Math.min(250, Number(rawWeightKg) || profile.weightKg || 50));
+    const finalTargetWeight = Math.max(30, Math.min(250, Number(rawTargetWeightKg) || profile.targetWeightKg || 60));
+    const finalAge = Math.max(10, Math.min(100, Number(rawAge) || profile.age || 26));
+    const finalWaterMl = Math.max(1000, Math.min(8000, Number(rawWaterGoalMl) || 3000));
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      age: finalAge,
+      gender,
+      heightFeet: finalFeet,
+      heightInches: finalInches,
+      weightKg: finalWeight,
+      targetWeightKg: finalTargetWeight,
+      activityLevel,
+      weightGainPace,
+      dailyWaterGoalMl: finalWaterMl,
+      dailyWaterGoalGlasses: Math.round(finalWaterMl / 250),
+    };
+
+    onSave(updatedProfile);
     onClose();
   };
 
   const handleResetToUserDefault = () => {
-    setFormData({
-      name: 'Raihan',
-      age: 26,
-      gender: 'male',
-      heightFeet: 5,
-      heightInches: 9,
-      weightKg: 50,
-      targetWeightKg: 60,
-      activityLevel: 'light',
-      weightGainPace: 'steady',
-      dailyWaterGoalGlasses: 12,
-      dailyWaterGoalMl: 3000,
-    });
+    setRawAge('26');
+    setGender('male');
+    setRawHeightFeet('5');
+    setRawHeightInches('9');
+    setRawWeightKg('50');
+    setRawTargetWeightKg('60');
+    setActivityLevel('light');
+    setWeightGainPace('steady');
+    setRawWaterGoalMl('3000');
   };
 
   return (
@@ -330,27 +390,45 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <input
                     id="user-age"
                     type="number"
-                    min="12"
-                    max="90"
-                    value={formData.age}
-                    onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) || 26 })}
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500"
+                    min="10"
+                    max="100"
+                    value={rawAge}
+                    onChange={(e) => setRawAge(e.target.value)}
+                    placeholder="26"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 font-semibold"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="user-gender" className="block text-xs font-medium text-zinc-300 mb-1">
-                    {lang === 'bn' ? 'লিঙ্গ' : 'Gender'}
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">
+                    {lang === 'bn' ? 'লিঙ্গ (Gender)' : 'Gender'}
                   </label>
-                  <select
-                    id="user-gender"
-                    value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value as 'male' | 'female' })}
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="male">{lang === 'bn' ? 'পুরুষ (Male)' : 'Male'}</option>
-                    <option value="female">{lang === 'bn' ? 'মহিলা (Female)' : 'Female'}</option>
-                  </select>
+                  <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setGender('male')}
+                      className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                        gender === 'male'
+                          ? 'bg-emerald-600 text-zinc-950 font-black shadow-md shadow-emerald-950/50'
+                          : 'bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700'
+                      }`}
+                    >
+                      <span className="text-sm">♂</span>
+                      <span>{lang === 'bn' ? 'পুরুষ' : 'Male'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGender('female')}
+                      className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                        gender === 'female'
+                          ? 'bg-emerald-600 text-zinc-950 font-black shadow-md shadow-emerald-950/50'
+                          : 'bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700'
+                      }`}
+                    >
+                      <span className="text-sm">♀</span>
+                      <span>{lang === 'bn' ? 'মহিলা' : 'Female'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -365,9 +443,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       type="number"
                       min="3"
                       max="7"
-                      value={formData.heightFeet}
-                      onChange={(e) => setFormData({ ...formData, heightFeet: Number(e.target.value) || 5 })}
-                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-12"
+                      value={rawHeightFeet}
+                      onChange={(e) => setRawHeightFeet(e.target.value)}
+                      placeholder="5"
+                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-12 font-semibold"
                       required
                       aria-label="Height feet"
                     />
@@ -378,17 +457,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       type="number"
                       min="0"
                       max="11"
-                      value={formData.heightInches}
-                      onChange={(e) => setFormData({ ...formData, heightInches: Number(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-12"
+                      value={rawHeightInches}
+                      onChange={(e) => setRawHeightInches(e.target.value)}
+                      placeholder="9"
+                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-12 font-semibold"
                       required
                       aria-label="Height inches"
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-zinc-400">{lang === 'bn' ? 'ইঞ্চি' : 'in'}</span>
                   </div>
                 </div>
-                <p className="text-[11px] text-zinc-400 mt-1">
-                  {lang === 'bn' ? `মোট উচ্চতা: ${heightCm} সেন্টিমিটার` : `Total: ${heightCm} cm`}
+                <p className="text-[11px] text-emerald-400 font-semibold mt-1 flex items-center gap-1">
+                  <span>✓</span>
+                  <span>{lang === 'bn' ? `মোট উচ্চতা: ${heightCm} সেন্টিমিটার` : `Live Total: ${heightCm} cm`}</span>
                 </p>
               </div>
 
@@ -403,11 +484,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       id="user-weight"
                       type="number"
                       step="0.5"
-                      min="30"
-                      max="180"
-                      value={formData.weightKg}
-                      onChange={(e) => setFormData({ ...formData, weightKg: Number(e.target.value) || 50 })}
-                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-10"
+                      min="25"
+                      max="200"
+                      value={rawWeightKg}
+                      onChange={(e) => setRawWeightKg(e.target.value)}
+                      placeholder="50"
+                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-10 font-semibold"
                       required
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-zinc-400">kg</span>
@@ -422,11 +504,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       id="target-weight"
                       type="number"
                       step="0.5"
-                      min="40"
-                      max="150"
-                      value={formData.targetWeightKg}
-                      onChange={(e) => setFormData({ ...formData, targetWeightKg: Number(e.target.value) || 60 })}
-                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-10"
+                      min="30"
+                      max="200"
+                      value={rawTargetWeightKg}
+                      onChange={(e) => setRawTargetWeightKg(e.target.value)}
+                      placeholder="60"
+                      className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-10 font-semibold"
                       required
                     />
                     <span className="absolute right-3 top-2.5 text-xs text-zinc-400">kg</span>
@@ -445,11 +528,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     id="daily-water-target"
                     type="number"
                     step="250"
-                    min="1500"
-                    max="6000"
-                    value={formData.dailyWaterGoalMl || 3000}
-                    onChange={(e) => setFormData({ ...formData, dailyWaterGoalMl: Number(e.target.value) || 3000 })}
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-12"
+                    min="1000"
+                    max="8000"
+                    value={rawWaterGoalMl}
+                    onChange={(e) => setRawWaterGoalMl(e.target.value)}
+                    placeholder="3000"
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 pr-12 font-semibold"
                   />
                   <span className="absolute right-3 top-2.5 text-xs text-zinc-400">ml</span>
                 </div>
@@ -465,9 +549,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 </label>
                 <select
                   id="user-activity"
-                  value={formData.activityLevel}
-                  onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value as ActivityLevel })}
-                  className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500"
+                  value={activityLevel}
+                  onChange={(e) => setActivityLevel(e.target.value as ActivityLevel)}
+                  className="w-full px-3 py-2 rounded-xl bg-zinc-800/90 border border-zinc-700 text-white text-sm focus:outline-none focus:border-emerald-500 font-semibold cursor-pointer"
                 >
                   <option value="sedentary">
                     {lang === 'bn' ? 'কম পরিশ্রমী (বসে কাজ / ডেস্ক জব, BMR x 1.2)' : 'Sedentary (Desk job, minimal exercise, x1.2)'}
@@ -514,10 +598,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     <button
                       type="button"
                       key={pace.id}
-                      onClick={() => setFormData({ ...formData, weightGainPace: pace.id })}
+                      onClick={() => setWeightGainPace(pace.id)}
                       className={`p-2.5 rounded-xl border text-left transition-all relative ${
-                        formData.weightGainPace === pace.id
-                          ? 'bg-emerald-950/60 border-emerald-500 text-white'
+                        weightGainPace === pace.id
+                          ? 'bg-emerald-950/60 border-emerald-500 text-white shadow-sm'
                           : 'bg-zinc-800/60 border-zinc-700 text-zinc-300 hover:border-zinc-600'
                       }`}
                     >
@@ -544,7 +628,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-zinc-950 text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950/50"
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-zinc-950 text-xs font-bold transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950/50 active:scale-95"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>{lang === 'bn' ? 'সংরক্ষণ করুন' : 'Save & Recalculate'}</span>
