@@ -8,11 +8,11 @@
     <meta property="og:title" content="Weight Gain - Bangladeshi Health & Nutrition Guide" />
     <meta property="og:description" content="Practical weight gain and nutrition guide tailored for Bangladesh, featuring local food calorie and portion calculator, 3L hydration tracker, macro targets, and body progress tracking." />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#10b981" />
+    <meta name="theme-color" content="#000000" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="WeightGain" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Weight Gain" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
@@ -21,9 +21,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="bg-black text-white m-0 p-0 antialiased selection:bg-emerald-500 selection:text-black">
+    <div id="root">
+      <!-- Native PWA Launch Splash Screen (replaced seamlessly upon React hydration) -->
+      <div id="pwa-splash" style="position: fixed; inset: 0; background-color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;">
+        <div style="width: 84px; height: 84px; border-radius: 20px; background-color: #09090b; border: 1px solid #27272a; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.9); margin-bottom: 20px; overflow: hidden;">
+          <img src="/assets/aistudio/Gym__1_-Photoroom_ac8711eb.png" alt="Weight Gain Logo" style="width: 72px; height: 72px; object-fit: contain;" />
+        </div>
+        <div style="font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 5px;">
+          WEIGHT GAIN
+        </div>
+        <div style="font-size: 10px; font-weight: 600; color: #a1a1aa; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 26px;">
+          BANGLADESHI HEALTH & NUTRITION GUIDE
+        </div>
+        <div style="width: 26px; height: 26px; border: 2.5px solid #27272a; border-top-color: #10b981; border-radius: 50%; animation: pwa-spinner 0.8s linear infinite;"></div>
+        <style>
+          @keyframes pwa-spinner {
+            to { transform: rotate(360deg); }
+          }
+        </style>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

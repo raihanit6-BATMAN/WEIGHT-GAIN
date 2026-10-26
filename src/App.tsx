@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { UserProfile, LoggedMealItem, WeightHistoryEntry, GroceryItem, MealType, FoodItem } from './types';
+import { UserProfile, LoggedMealItem, WeightHistoryEntry, GroceryItem, MealType, FoodItem, DailyHistoryEntry } from './types';
 import {
   loadProfile,
   saveProfile,
@@ -20,8 +20,11 @@ import {
   saveWaterMl,
   loadLanguage,
   saveLanguage,
+  loadDailyHistory,
+  saveDailyHistory,
 } from './utils/storage';
 import { convertHeightToCm, calculateBMR, calculateTDEE, calculateTargetCalories } from './utils/healthMath';
+import { checkAndPerformDailyReset, forceSimulateDailyReset } from './utils/dailyReset';
 import { ParsedMealSegment } from './utils/banglishParser';
 import { registerServiceWorker } from './utils/serviceWorkerRegistration';
 import {
@@ -51,6 +54,7 @@ export default function App() {
   const [profile, setProfile] = useState<UserProfile>(loadProfile);
   const [loggedMeals, setLoggedMeals] = useState<LoggedMealItem[]>(loadLoggedMeals);
   const [weightHistory, setWeightHistory] = useState<WeightHistoryEntry[]>(loadWeightHistory);
+  const [dailyHistory, setDailyHistory] = useState<DailyHistoryEntry[]>(loadDailyHistory);
   const [groceryList, setGroceryList] = useState<GroceryItem[]>(loadGroceryList);
   const [waterMl, setWaterMl] = useState<number>(loadWaterMl);
   const [lang, setLang] = useState<'en' | 'bn'>(loadLanguage);
@@ -79,6 +83,10 @@ export default function App() {
   useEffect(() => {
     saveWeightHistory(weightHistory);
   }, [weightHistory]);
+
+  useEffect(() => {
+    saveDailyHistory(dailyHistory);
+  }, [dailyHistory]);
 
   useEffect(() => {
     saveGroceryList(groceryList);
@@ -113,6 +121,48 @@ export default function App() {
   useEffect(() => {
     registerServiceWorker();
   }, []);
+
+  // Automatic Daily Midnight Reset with History Archiving (Mount & Visibility Change)
+  useEffect(() => {
+    const handleMidnightCheck = () => {
+      const res = checkAndPerformDailyReset(loggedMeals, waterMl, targets.targetCalories);
+      if (res.didReset) {
+        setLoggedMeals([]);
+        setWaterMl(0);
+        if (res.updatedHistory) {
+          setDailyHistory(res.updatedHistory);
+        }
+      }
+    };
+
+    // Initial check on mount
+    handleMidnightCheck();
+
+    // Check on app visibility change (e.g. user opens phone in morning)
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        handleMidnightCheck();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    const interval = setInterval(handleMidnightCheck, 30000); // Also periodic check every 30s
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      clearInterval(interval);
+    };
+  }, [loggedMeals, waterMl, targets.targetCalories]);
+
+  const handleSimulateNewDay = () => {
+    const res = forceSimulateDailyReset(loggedMeals, waterMl, targets.targetCalories);
+    if (res.didReset) {
+      setLoggedMeals([]);
+      setWaterMl(0);
+      if (res.updatedHistory) {
+        setDailyHistory(res.updatedHistory);
+      }
+    }
+  };
 
   // Automated Daily Notification Scheduler (10 AM, 2 PM, 9 PM)
   useEffect(() => {
@@ -323,9 +373,15 @@ export default function App() {
           <WeightTrackerView
             profile={profile}
             weightHistory={weightHistory}
+            dailyHistory={dailyHistory}
+            targetCalories={targets.targetCalories}
+            todayCalories={todayCalories}
+            todayProtein={todayProtein}
+            todayWaterMl={waterMl}
             onAddWeightEntry={handleAddWeightEntry}
             onDeleteWeightEntry={handleDeleteWeightEntry}
             onUpdateProfileWeight={handleUpdateProfileWeight}
+            onSimulateNewDay={handleSimulateNewDay}
             lang={lang}
           />
         );

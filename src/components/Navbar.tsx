@@ -38,23 +38,23 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800 text-white">
       <div className="max-w-5xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3">
         {/* Brand / Logo */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-black border border-zinc-700/80 flex items-center justify-center shadow-lg shadow-black/80 overflow-hidden shrink-0">
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-black border border-zinc-800 flex items-center justify-center shadow-lg shadow-black/80 overflow-hidden shrink-0">
             <img
-              src="/assets/aistudio/Gym_e79f6db9.jpg"
-              alt="Weight Gain BD Logo"
-              className="w-full h-full object-cover"
+              src="/assets/aistudio/Gym__1_-Photoroom_ac8711eb.png"
+              alt="Weight Gain Bicep Logo"
+              className="w-full h-full object-contain p-0.5"
             />
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1 truncate">
-                <span>Weight Gain</span>
-                {lang === 'bn' && <span className="text-zinc-400 font-medium text-[11px] hidden xs:inline">(ওয়েট গেইন)</span>}
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-sm sm:text-base tracking-wide text-white uppercase font-sans truncate">
+                WEIGHT GAIN
               </span>
+              {lang === 'bn' && <span className="text-zinc-500 font-semibold text-[10px] hidden xs:inline">(ওয়েট গেইন)</span>}
             </div>
-            <p className="text-[10px] sm:text-[11px] text-zinc-400 hidden md:block truncate">
-              {lang === 'bn' ? 'দেশি খাবারে স্বাস্থ্যসম্মত ওজন বৃদ্ধির সহজ সমাধান' : 'Healthy weight gain for Bangladeshi lifestyle'}
+            <p className="text-[9px] sm:text-[10px] text-zinc-400 font-medium tracking-wider uppercase truncate">
+              {lang === 'bn' ? 'বাংলাদেশি হেলথ ও নিউট্রিশন গাইড' : 'BANGLADESHI HEALTH & NUTRITION GUIDE'}
             </p>
           </div>
         </div>

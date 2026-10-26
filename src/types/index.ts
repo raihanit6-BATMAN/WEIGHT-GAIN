@@ -89,6 +89,19 @@ export interface LoggedMealItem {
   oilLevel?: 'low' | 'normal' | 'high';
 }
 
+export interface DailyHistoryEntry {
+  id: string;
+  date: string; // YYYY-MM-DD local date
+  totalCalories: number;
+  targetCalories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+  waterMl: number;
+  loggedMeals?: LoggedMealItem[];
+  isGoalHit: boolean;
+}
+
 export interface WeightHistoryEntry {
   id: string;
   date: string;

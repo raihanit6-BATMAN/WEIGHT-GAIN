@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { UserProfile, LoggedMealItem, WeightHistoryEntry, GroceryItem } from '../types';
+import { UserProfile, LoggedMealItem, WeightHistoryEntry, GroceryItem, DailyHistoryEntry } from '../types';
 import { INITIAL_GROCERY_CHECKLIST } from '../data/bangladeshiFoods';
 
 const STORAGE_KEYS = {
@@ -14,6 +14,8 @@ const STORAGE_KEYS = {
   WATER_GLASSES: 'pushtigain_water_v2',
   WATER_ML: 'pushtigain_water_ml_v3',
   LANGUAGE: 'pushtigain_lang_v2',
+  LAST_ACTIVE_DATE: 'pushtigain_last_active_date_v2',
+  DAILY_HISTORY: 'pushtigain_daily_history_v2',
 };
 
 export const DEFAULT_PROFILE: UserProfile = {
@@ -228,3 +230,83 @@ export function saveLanguage(lang: 'en' | 'bn'): void {
     // fallback
   }
 }
+
+export function getLocalTodayDateString(): string {
+  try {
+    return new Date().toLocaleDateString('en-CA');
+  } catch {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+}
+
+export function loadLastActiveDate(): string {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.LAST_ACTIVE_DATE);
+    if (raw) return raw;
+  } catch (e) {
+    console.error('Failed to load last active date', e);
+  }
+  return '';
+}
+
+export function saveLastActiveDate(dateStr: string): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.LAST_ACTIVE_DATE, dateStr);
+  } catch (e) {
+    console.error('Failed to save last active date', e);
+  }
+}
+
+export function getInitialDailyHistory(): DailyHistoryEntry[] {
+  const result: DailyHistoryEntry[] = [];
+  const baseTarget = 2750;
+  const sampleConsumptions = [
+    { offsetDays: 1, cal: 2840, prot: 118, carb: 395, fat: 82, water: 3000, hit: true },
+    { offsetDays: 2, cal: 2790, prot: 114, carb: 388, fat: 80, water: 2750, hit: true },
+    { offsetDays: 3, cal: 2910, prot: 122, carb: 410, fat: 85, water: 3250, hit: true },
+    { offsetDays: 4, cal: 2680, prot: 105, carb: 375, fat: 74, water: 2500, hit: false },
+    { offsetDays: 5, cal: 2800, prot: 115, carb: 390, fat: 79, water: 3000, hit: true },
+    { offsetDays: 6, cal: 2850, prot: 120, carb: 400, fat: 81, water: 3000, hit: true },
+  ];
+
+  for (const s of sampleConsumptions) {
+    const d = new Date();
+    d.setDate(d.getDate() - s.offsetDays);
+    const dateStr = d.toLocaleDateString('en-CA');
+    result.push({
+      id: `dh-seed-${dateStr}`,
+      date: dateStr,
+      totalCalories: s.cal,
+      targetCalories: baseTarget,
+      protein: s.prot,
+      carbs: s.carb,
+      fats: s.fat,
+      waterMl: s.water,
+      isGoalHit: s.hit,
+    });
+  }
+  return result;
+}
+
+export function loadDailyHistory(): DailyHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.DAILY_HISTORY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.error('Failed to load daily history', e);
+  }
+  return getInitialDailyHistory();
+}
+
+export function saveDailyHistory(history: DailyHistoryEntry[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.DAILY_HISTORY, JSON.stringify(history));
+  } catch (e) {
+    console.error('Failed to save daily history', e);
+  }
+}
+

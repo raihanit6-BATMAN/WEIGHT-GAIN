@@ -1,13 +1,13 @@
 {
   "id": "/",
-  "name": "Weight Gain BD",
-  "short_name": "WeightGain",
-  "description": "Healthy weight gain guide, Bangladeshi calorie & nutrition logger, 3L hydration tracker, and meal plans.",
+  "name": "WEIGHT GAIN - Bangladeshi Health & Nutrition Guide",
+  "short_name": "Weight Gain",
+  "description": "Healthy weight gain guide, Bangladeshi calorie & nutrition logger, 3L hydration tracker, and home-cooked meal planner.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#10b981",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
